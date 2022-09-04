@@ -1,23 +1,10 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
-// import { App } from "@serverless-stack/resources";
-import { WebStack } from "../stacks";
-import { APIStack } from "../stacks";
-
-// export default function main(app: App) {
-//     app.setDefaultFunctionProps({
-//       runtime: "nodejs16.x",
-//       srcPath: "services",
-//       bundle: {
-//         format: "esm"
-//       }
-//     });
-//     app
-//       .stack(Database)
-//       .stack(Api)
-//       .stack(Web);
-//   }
+import { WebStack, APIStack, DatabaseStack } from "../stacks";
 
 const app = new cdk.App();
+
+const db = new DatabaseStack(app, "AwSomeAgencyStackDB");
+console.log("DB", db.tableName);
+// new APIStack(app, "AwSomeAgencyStackAPI");
 // new WebStack(app, "AwSomeAgencyStackWeb");
-new APIStack(app, "AwSomeAgencyStackAPI");

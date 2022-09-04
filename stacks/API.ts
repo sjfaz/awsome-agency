@@ -1,74 +1,111 @@
 import {
-  LambdaIntegration,
-  MethodLoggingLevel,
-  RestApi,
-} from "aws-cdk-lib/aws-apigateway";
-import { PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { Function, Runtime, AssetCode, Code } from "aws-cdk-lib/aws-lambda";
-import { Duration, Stack, StackProps, CfnOutput } from "aws-cdk-lib";
-import s3 = require("aws-cdk-lib/aws-s3");
+  CorsHttpMethod,
+  HttpApi,
+  HttpMethod,
+} from "@aws-cdk/aws-apigatewayv2-alpha";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as cdk from "aws-cdk-lib";
+import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha";
+import {
+  NodejsFunction,
+  NodejsFunctionProps,
+  LogLevel,
+} from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
 
-interface LambdaApiStackProps extends StackProps {
-  functionName: string;
-}
+const lambdaFnProps: Partial<NodejsFunctionProps> = {
+  bundling: {
+    target: "es2020",
+    keepNames: true,
+    logLevel: LogLevel.INFO,
+    sourceMap: true,
+    minify: true,
+  },
+  runtime: lambda.Runtime.NODEJS_16_X,
+  timeout: cdk.Duration.seconds(6),
+  memorySize: 512,
+  logRetention: RetentionDays.ONE_DAY,
+  environment: {
+    NODE_OPTIONS: "--enable-source-maps",
+  },
+};
+
+interface LambdaApiStackProps extends cdk.StackProps {}
 
 export class LambdaApiStack extends Construct {
-  private restApi: RestApi;
-  private lambdaFunction: Function;
-  private bucket: s3.Bucket;
-
-  constructor(parent: Stack, name: string, props: LambdaApiStackProps) {
+  constructor(parent: cdk.Stack, name: string, props: LambdaApiStackProps) {
     super(parent, name);
 
-    this.bucket = new s3.Bucket(this, "WidgetStore");
-
-    this.restApi = new RestApi(this, parent.stackName + "RestApi", {
-      deployOptions: {
-        stageName: "beta",
-        metricsEnabled: true,
-        loggingLevel: MethodLoggingLevel.INFO,
-        dataTraceEnabled: true,
-      },
-      defaultCorsPreflightOptions: {
+    const httpApi = new HttpApi(this, "http-api-example", {
+      description: "HTTP API example",
+      corsPreflight: {
         allowHeaders: [
           "Content-Type",
           "X-Amz-Date",
           "Authorization",
           "X-Api-Key",
         ],
-        allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
-        allowCredentials: true,
+        allowMethods: [
+          CorsHttpMethod.OPTIONS,
+          CorsHttpMethod.GET,
+          CorsHttpMethod.POST,
+          CorsHttpMethod.PUT,
+          CorsHttpMethod.PATCH,
+          CorsHttpMethod.DELETE,
+        ],
         allowOrigins: ["*"],
       },
     });
 
-    const lambdaPolicy = new PolicyStatement();
-    lambdaPolicy.addActions("s3:ListBucket");
-    lambdaPolicy.addResources(this.bucket.bucketArn);
+    // 👇 create get-todos Lambda
+    // const simpleLambda = new lambda.Function(this, "get-data", {
+    //   runtime: lambda.Runtime.NODEJS_16_X,
+    //   handler: "simple.handler",
+    //   code: new lambda.AssetCode(`./services/dist`),
+    // });
 
-    this.lambdaFunction = new Function(this, props.functionName, {
-      functionName: props.functionName,
-      handler: "tRPC.handler",
-      runtime: Runtime.NODEJS_16_X,
-      code: new AssetCode(`./services/dist`),
+    const newFunc = new NodejsFunction(this, "GetData", {
+      ...lambdaFnProps,
+      entry: "./services/functions/simple.ts", // accepts .js, .jsx, .ts and .tsx files
+      functionName: "simple",
+      handler: "handler",
       memorySize: 512,
-      timeout: Duration.seconds(30),
-      environment: {
-        BUCKET: this.bucket.bucketName,
-      },
-      initialPolicy: [lambdaPolicy],
+      timeout: cdk.Duration.seconds(30),
     });
 
-    this.restApi.root.addMethod(
-      "GET",
-      new LambdaIntegration(this.lambdaFunction, {})
-    );
+    const newFuncRPC = new NodejsFunction(this, "GetRPC", {
+      ...lambdaFnProps,
+      entry: "./services/functions/tRPC.ts", // accepts .js, .jsx, .ts and .tsx files
+      functionName: "tRPC",
+      handler: "handler",
+      memorySize: 512,
+      timeout: cdk.Duration.seconds(30),
+    });
 
-    // this.restApi.root
+    // const tRPCLambda = new lambda.Function(this, "get-trpc", {
+    //   runtime: lambda.Runtime.NODEJS_16_X,
+    //   handler: "tRPC.handler",
+    //   code: new lambda.AssetCode(`./services/dist`),
+    // });
 
-    new CfnOutput(this, "API Url", {
-      value: this.restApi.url,
+    // 👇 add route for GET /todos
+    httpApi.addRoutes({
+      path: "/simple",
+      methods: [HttpMethod.GET],
+      integration: new HttpLambdaIntegration("beta-integration", newFunc),
+    });
+
+    // 👇 add route for GET /todos
+    httpApi.addRoutes({
+      path: "/beta/{proxy+}",
+      methods: [HttpMethod.GET],
+      integration: new HttpLambdaIntegration("beta-integration2", newFuncRPC),
+    });
+
+    new cdk.CfnOutput(this, "apiUrl", {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      value: httpApi.url!,
     });
   }
 }

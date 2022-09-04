@@ -44,10 +44,10 @@ import { trpc } from "../utils/trpc";
 function App() {
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() => {
-    const token = localStorage.getItem("token");
+    // const token = localStorage.getItem("token");
     return trpc.createClient({
-      // url: "http://localhost:5000/trpc",
-      url: "https://1300a0ugh3.execute-api.eu-west-1.amazonaws.com/beta/",
+      url: "http://127.0.0.1:3000/beta",
+      // url: "https://gpt7moq413.execute-api.eu-west-1.amazonaws.com/beta",
       // headers: {
       //   Authorization: `Bearer ${token}`,
       // },
@@ -69,7 +69,7 @@ function Sample() {
 
   return (
     <div>
-      <div>{hello.isLoading ? "Loading..." : hello.data?.id}</div>
+      <div>{hello.isLoading ? "Loading..." : hello.data?.name}</div>
       <button
         disabled={createUser.isLoading}
         onClick={() => {

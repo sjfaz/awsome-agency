@@ -6,16 +6,12 @@ import { CfnOutput, RemovalPolicy, Stack } from "aws-cdk-lib";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 
-export interface StaticSiteProps {
-  domainName?: string;
-  siteSubDomain?: string;
-}
+export interface StaticSiteProps {}
 
 /**
  * Static site infrastructure, which deploys site content to an S3 bucket.
  *
- * The site redirects from HTTP to HTTPS, using a CloudFront distribution,
- * Route53 alias record, and ACM certificate.
+ * The site redirects from HTTP to HTTPS, using a CloudFront distribution.
  */
 export class StaticSite extends Construct {
   constructor(parent: Stack, name: string, props: StaticSiteProps) {
