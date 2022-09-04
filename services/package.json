@@ -1,0 +1,12 @@
+{
+  "name": "services",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@trpc/server": "^9.27.0",
+    "@types/aws-lambda": "^8.10.102",
+    "aws-lambda": "^1.0.7",
+    "zod": "^3.18.0"
+  }
+}
