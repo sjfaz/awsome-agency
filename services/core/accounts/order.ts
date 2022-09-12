@@ -18,12 +18,12 @@ async function putOrder(item: Item) {
   return res;
 }
 
-async function getOrder(key: Key) {
-  const res = getClient()
-    .get({ ...params, Key: key })
-    .promise();
-  return res;
-}
+// async function getOrder(key: Key) {
+//   const res = getClient()
+//     .get({ ...params, Key: key })
+//     .promise();
+//   return res;
+// }
 
 async function getOrders(email: string) {
   const res = getClient()

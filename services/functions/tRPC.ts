@@ -17,17 +17,21 @@ const appRouter = trpc
   })
   .mutation("createOrder", {
     input: z.object({
+      name: z.string(),
       email: z.string(),
+      orderType: z.string(),
     }),
     async resolve(req) {
       // Write to DB
-      // await new Promise((resolve) => setTimeout(resolve, 3000));
       const date = new Date().toISOString();
       const item = {
         pk: req.input.email,
         sk: `Order#${date}`,
         createdDate: date,
         entityType: "Order",
+        name: req.input.name,
+        email: req.input.email,
+        orderType: req.input.orderType,
       };
       const order = await Order.putOrder(item);
       return order;

@@ -3,19 +3,19 @@ import {
   HttpApi,
   HttpMethod,
 } from "@aws-cdk/aws-apigatewayv2-alpha";
-import * as cdk from "aws-cdk-lib";
+import { StackProps, Stack, Duration, CfnOutput, aws_ssm } from "aws-cdk-lib";
 import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import { lambdaFnProps } from "./utils";
 import { ITable } from "aws-cdk-lib/aws-dynamodb";
 
-interface LambdaApiStackProps extends cdk.StackProps {
+interface LambdaApiStackProps extends StackProps {
   table: ITable;
 }
 
 export class LambdaApiStack extends Construct {
-  constructor(parent: cdk.Stack, name: string, props: LambdaApiStackProps) {
+  constructor(parent: Stack, name: string, props: LambdaApiStackProps) {
     super(parent, name);
 
     const httpApi = new HttpApi(this, "http-api-example", {
@@ -45,7 +45,13 @@ export class LambdaApiStack extends Construct {
       functionName: "simple",
       handler: "handler",
       memorySize: 512,
-      timeout: cdk.Duration.seconds(30),
+      timeout: Duration.seconds(30),
+      environment: {
+        SLACK_URL: aws_ssm.StringParameter.valueForStringParameter(
+          this,
+          "/awesome-agency/slack-url"
+        ),
+      },
     });
 
     const newFuncRPC = new NodejsFunction(this, "GetRPC", {
@@ -55,26 +61,26 @@ export class LambdaApiStack extends Construct {
       handler: "handler",
       memorySize: 512,
       environment: { TABLE_NAME: props.table.tableName },
-      timeout: cdk.Duration.seconds(30),
+      timeout: Duration.seconds(30),
     });
 
     props.table.grantFullAccess(newFuncRPC);
 
-    // 👇 add route for GET /todos
+    // Add route for GET /todos
     httpApi.addRoutes({
       path: "/simple",
       methods: [HttpMethod.GET],
       integration: new HttpLambdaIntegration("beta-integration", newFunc),
     });
 
-    // 👇 add route for GET /todos
+    // Add route for GET /todos
     httpApi.addRoutes({
       path: "/beta/{proxy+}",
       methods: [HttpMethod.GET],
       integration: new HttpLambdaIntegration("beta-integration2", newFuncRPC),
     });
 
-    // 👇 add route for POST /todos
+    // Add route for POST /todos
     httpApi.addRoutes({
       path: "/beta/{proxy+}",
       methods: [HttpMethod.POST],
@@ -85,13 +91,8 @@ export class LambdaApiStack extends Construct {
       ),
     });
 
-    new cdk.CfnOutput(this, "apiUrl", {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    new CfnOutput(this, "apiUrl", {
       value: httpApi.url!,
     });
-    // new cdk.CfnOutput(this, "Random", {
-    //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    //   value: props.table.tableName,
-    // });
   }
 }

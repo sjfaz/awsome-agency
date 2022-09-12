@@ -21,4 +21,7 @@ export type Key = {
 export type Item = Key & {
   entityType: string;
   createdDate: string;
+  email: string;
+  name: string;
+  orderType?: string;
 };

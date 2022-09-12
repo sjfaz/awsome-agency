@@ -6,4 +6,4 @@ const app = new cdk.App();
 
 const db = new DatabaseStack(app, "AwSomeAgencyStackDB");
 new APIStack(app, "AwSomeAgencyStackAPI", { table: db.table });
-// new WebStack(app, "AwSomeAgencyStackWeb");
+new WebStack(app, "AwSomeAgencyStackWeb");
