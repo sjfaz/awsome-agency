@@ -5,6 +5,5 @@ import { WebStack, APIStack, DatabaseStack } from "../stacks";
 const app = new cdk.App();
 
 const db = new DatabaseStack(app, "AwSomeAgencyStackDB");
-console.log("DB", db.tableName);
-// new APIStack(app, "AwSomeAgencyStackAPI");
+new APIStack(app, "AwSomeAgencyStackAPI", { table: db.table });
 // new WebStack(app, "AwSomeAgencyStackWeb");
