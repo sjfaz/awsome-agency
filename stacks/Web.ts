@@ -10,7 +10,6 @@ export interface StaticSiteProps {}
 
 /**
  * Static site infrastructure, which deploys site content to an S3 bucket.
- *
  * The site redirects from HTTP to HTTPS, using a CloudFront distribution.
  */
 export class StaticSite extends Construct {

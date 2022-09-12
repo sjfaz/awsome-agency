@@ -43,11 +43,11 @@ const createContext = ({
   context,
 }: CreateAWSLambdaContextOptions<APIGatewayProxyEvent>) => {
   return {
-    user: "foo",
-    tenant: "blah",
+    // user: "foo",
+    // tenant: "blah",
   };
 }; // no context
-type Context = trpc.inferAsyncReturnType<typeof createContext>;
+// type Context = trpc.inferAsyncReturnType<typeof createContext>;
 
 import {
   awsLambdaRequestHandler,
