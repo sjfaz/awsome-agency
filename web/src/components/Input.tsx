@@ -14,7 +14,7 @@ export const Input: React.FC<InputProps> = (props: InputProps) => {
   //keydown();
   return (
     <label className="input-group mb-2 mt-3">
-      <span>{props.labelName}</span>
+      <span className="w-[100px]">{props.labelName}</span>
       <input
         type="text"
         placeholder={props.labelName}

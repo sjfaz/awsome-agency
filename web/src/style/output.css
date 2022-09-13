@@ -2609,6 +2609,14 @@ html {
   width: 1.5rem;
 }
 
+.w-10 {
+  width: 2.5rem;
+}
+
+.w-\[100px\] {
+  width: 100px;
+}
+
 .max-w-md {
   max-width: 28rem;
 }
