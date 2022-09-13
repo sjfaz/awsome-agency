@@ -8,16 +8,23 @@ function App() {
     email: "",
     name: "",
     orderType: "Website",
+    showHistory: false,
   });
+  const { email, name, orderType, showHistory } = inputValue;
   const getOrders = trpc.useQuery(["getOrders", "shaun@example.com"]);
   const createOrder = trpc.useMutation(["createOrder"]);
-  const { email, name, orderType } = inputValue;
   const incompleteForm = !email || !name;
+  const toggleHistory = () => {
+    setInputValue((prev) => ({ ...prev, showHistory: !prev.showHistory }));
+  };
 
   return (
     <div className="bg-base-200 min-h-screen">
       <div className="hero pt-5">
-        <div className="hero-content text-center bg-base-300 w-[480px]">
+        <div
+          onClick={toggleHistory}
+          className="hero-content text-center bg-base-300 w-[480px]"
+        >
           <div className="max-w-md bg-base-500">
             <h1 className="text-5xl font-bold">AWSome Agency</h1>
             <p className="py-6">Enter your details to start your order.</p>
@@ -31,27 +38,30 @@ function App() {
             <div className="form-control w-[480px]">
               <Select
                 onchange={(e) =>
-                  setInputValue({ ...inputValue, orderType: e.target.value })
+                  setInputValue((prev) => ({
+                    ...prev,
+                    orderType: e.target.value,
+                  }))
                 }
               />
               <Input
                 labelName={"Name"}
                 value={name}
                 onchange={(e) =>
-                  setInputValue({ ...inputValue, name: e.target.value })
+                  setInputValue((prev) => ({ ...prev, name: e.target.value }))
                 }
               />
               <Input
                 labelName={"Email"}
                 value={email}
                 onchange={(e) =>
-                  setInputValue({ ...inputValue, email: e.target.value })
+                  setInputValue((prev) => ({ ...prev, email: e.target.value }))
                 }
               />
               <button
                 className="btn btn-primary mt-3"
                 disabled={createOrder.isLoading}
-                onClick={() => {
+                onClick={async () => {
                   if (incompleteForm) {
                     return;
                   }
@@ -60,6 +70,7 @@ function App() {
                     email,
                     orderType,
                   });
+                  getOrders.refetch();
                 }}
               >
                 {createOrder.isLoading ? "Creating..." : "Submit"}
@@ -68,14 +79,20 @@ function App() {
             {incompleteForm && (
               <Alert message="Please ensure the name and email are provided." />
             )}
-            <pre>{JSON.stringify(createOrder.data, null, 2)}</pre>
           </div>
-          <div className="pt-5 text-center">
-            {getOrders.isLoading
-              ? "Loading..."
-              : JSON.stringify(getOrders.data?.Items)}
-          </div>
-          <div>{JSON.stringify(inputValue)}</div>
+          {showHistory && (
+            <div className="pt-5 text-center">
+              {getOrders.isLoading
+                ? "Loading..."
+                : getOrders.data?.Items?.map((order, i) => (
+                    <div key={order.createdDate} className="mt-3">
+                      <p className="text-l font-bold">
+                        {`${order.createdDate} - ${order.email} - ${order.orderType}`}
+                      </p>
+                    </div>
+                  ))}
+            </div>
+          )}
         </div>
       </div>
       <footer className="footer footer-center p-4 bg-base-300 text-base-content">
