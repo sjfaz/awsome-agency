@@ -1,4 +1,4 @@
-import { getClient, Key, Item } from "../client";
+import { getClient, Key, Item } from "../common/client";
 
 const params = {
   TableName: process.env.TABLE_NAME ?? "Table",
@@ -17,13 +17,6 @@ async function putOrder(item: Item) {
     .promise();
   return res;
 }
-
-// async function getOrder(key: Key) {
-//   const res = getClient()
-//     .get({ ...params, Key: key })
-//     .promise();
-//   return res;
-// }
 
 async function getOrders(email: string) {
   const res = getClient()

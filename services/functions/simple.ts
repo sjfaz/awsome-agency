@@ -1,4 +1,4 @@
-import { doPostRequest } from "../core/messager";
+import { doPostRequest } from "../core/common/messager";
 
 const handler = async function (event: any, context: any) {
   try {

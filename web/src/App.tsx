@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Input, Alert, Select } from "./components";
 import { trpc } from "../utils/trpc";
 import "./style/App.css";
-// min-h-[calc(100vh-200px)]
 
 function App() {
   const [inputValue, setInputValue] = useState({
@@ -10,7 +9,7 @@ function App() {
     name: "",
     orderType: "Website",
   });
-  const getOrders = trpc.useQuery(["getOrders", "s@s.com"]);
+  const getOrders = trpc.useQuery(["getOrders", "shaun@example.com"]);
   const createOrder = trpc.useMutation(["createOrder"]);
   const { email, name, orderType } = inputValue;
   const incompleteForm = !email || !name;
