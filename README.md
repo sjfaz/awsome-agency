@@ -40,8 +40,9 @@ This is a mono-repo with workspaces for web and services. Dependencies are manag
 ## Services Project
 
 - Store domain logic in the core folder under Marketing, Accounts etc.
-- For Lamnbda handler functions store in the functions folder.
-- `yarn css` start tailwind css watcher
+- You can unit test your domain specific logic here.
+- For Lambda handler functions store in the functions folder.
+- Import domain logic into the handler functions where needed.
 
 ## Other useful CDK commands below:
 
