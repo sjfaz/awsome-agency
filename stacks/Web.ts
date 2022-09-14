@@ -1,12 +1,24 @@
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
-import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront_origins from "aws-cdk-lib/aws-cloudfront-origins";
-import { CfnOutput, RemovalPolicy, Stack } from "aws-cdk-lib";
+import { CfnOutput, RemovalPolicy, Stack, DockerImage } from "aws-cdk-lib";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
+import { join } from "path";
+import { execSync, ExecSyncOptions } from "child_process";
+import { copySync } from "fs-extra";
+import {
+  AwsCustomResource,
+  AwsCustomResourcePolicy,
+  PhysicalResourceId,
+} from "aws-cdk-lib/custom-resources";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 
-export interface StaticSiteProps {}
+export interface StaticSiteProps {
+  apiUrl: string;
+}
 
 /**
  * Static site infrastructure, which deploys site content to an S3 bucket.
@@ -69,12 +81,69 @@ export class StaticSite extends Construct {
       value: distribution.domainName,
     });
 
-    // Deploy site contents to S3 bucket
-    new s3deploy.BucketDeployment(this, "DeployWithInvalidation", {
-      sources: [s3deploy.Source.asset("./web/dist")],
+    const execOptions: ExecSyncOptions = {
+      stdio: ["ignore", process.stderr, "inherit"],
+    };
+
+    // TODO: check why sometimes bundle does build on synth
+    const bundle = Source.asset(join(__dirname, "../web"), {
+      bundling: {
+        command: [
+          "sh",
+          "-c",
+          'echo "Docker build not supported. Please install esbuild."',
+        ],
+        image: DockerImage.fromRegistry("alpine"),
+        local: {
+          tryBundle(outputDir: string) {
+            try {
+              execSync("esbuild --version", execOptions);
+            } catch {
+              return false;
+            }
+            execSync(`cd web && yarn build`, execOptions);
+            copySync(join(__dirname, "../web/dist"), outputDir, {
+              ...execOptions,
+              recursive: true,
+            });
+            return true;
+          },
+        },
+      },
+    });
+
+    // Deploy site contents to S3 bucket. Cache invalidation can take a long time.
+    new BucketDeployment(this, "DeployWithInvalidation", {
+      sources: [bundle], //[Source.asset("./web/dist")]
       destinationBucket: siteBucket,
       distribution,
+      prune: false,
       distributionPaths: ["/*"],
+    });
+
+    // Generate a config.json file and place in S3 so the web app can grab the API URL.
+    new AwsCustomResource(this, "ApiUrlResource", {
+      logRetention: RetentionDays.ONE_DAY,
+      onUpdate: {
+        action: "putObject",
+        parameters: {
+          Body: Stack.of(this).toJsonString({
+            apiUrl: props.apiUrl,
+          }),
+          Bucket: siteBucket.bucketName,
+          CacheControl: "max-age=0, no-cache, no-store, must-revalidate",
+          ContentType: "application/json",
+          Key: "config.json",
+        },
+        physicalResourceId: PhysicalResourceId.of("config"),
+        service: "S3",
+      },
+      policy: AwsCustomResourcePolicy.fromStatements([
+        new PolicyStatement({
+          actions: ["s3:PutObject"],
+          resources: [siteBucket.arnForObjects("config.json")],
+        }),
+      ]),
     });
   }
 }

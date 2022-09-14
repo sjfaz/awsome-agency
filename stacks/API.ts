@@ -15,6 +15,7 @@ interface LambdaApiStackProps extends StackProps {
 }
 
 export class LambdaApiStack extends Construct {
+  public readonly apiUrl: string;
   constructor(parent: Stack, name: string, props: LambdaApiStackProps) {
     super(parent, name);
 
@@ -91,6 +92,7 @@ export class LambdaApiStack extends Construct {
       ),
     });
 
+    this.apiUrl = httpApi.url!;
     new CfnOutput(this, "apiUrl", {
       value: httpApi.url!,
     });

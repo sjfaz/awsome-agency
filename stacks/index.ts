@@ -20,17 +20,22 @@ interface APIProps extends StackProps {
 }
 
 export class APIStack extends Stack {
+  public readonly apiUrl: string;
   constructor(scope: Construct, id: string, props: APIProps) {
     super(scope, id, props);
-
-    new LambdaApiStack(this, "API", { table: props.table });
+    const api = new LambdaApiStack(this, "API", { table: props.table });
+    this.apiUrl = api.apiUrl;
   }
 }
 
+interface WebProps extends StackProps {
+  apiUrl: string;
+}
+
 export class WebStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, props: WebProps) {
     super(scope, id, props);
 
-    new StaticSite(this, "StaticSite", {});
+    new StaticSite(this, "StaticSite", { apiUrl: props.apiUrl });
   }
 }

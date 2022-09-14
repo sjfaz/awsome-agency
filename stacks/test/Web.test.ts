@@ -5,7 +5,9 @@ import * as AwSomeAgency from "..";
 test("S3 Bucket is created", () => {
   const app = new cdk.App();
   // WHEN
-  const stack = new AwSomeAgency.WebStack(app, "MyTestStack");
+  const stack = new AwSomeAgency.WebStack(app, "MyTestStack", {
+    apiUrl: "dummyurl",
+  });
   // THEN
 
   const template = Template.fromStack(stack);

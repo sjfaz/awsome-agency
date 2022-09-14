@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Input, Alert, Select } from "./components";
 import { trpc } from "../utils/trpc";
+import { OrderHistory } from "./components";
 import "./style/App.css";
 
 function App() {
@@ -11,7 +12,6 @@ function App() {
     showHistory: false,
   });
   const { email, name, orderType, showHistory } = inputValue;
-  const getOrders = trpc.useQuery(["getOrders", "shaun@example.com"]);
   const createOrder = trpc.useMutation(["createOrder"]);
   const incompleteForm = !email || !name;
   const toggleHistory = () => {
@@ -70,7 +70,6 @@ function App() {
                     email,
                     orderType,
                   });
-                  getOrders.refetch();
                 }}
               >
                 {createOrder.isLoading ? "Creating..." : "Submit"}
@@ -80,19 +79,7 @@ function App() {
               <Alert message="Please ensure the name and email are provided." />
             )}
           </div>
-          {showHistory && (
-            <div className="pt-5 text-center">
-              {getOrders.isLoading
-                ? "Loading..."
-                : getOrders.data?.Items?.map((order, i) => (
-                    <div key={order.createdDate} className="mt-3">
-                      <p className="text-l font-bold">
-                        {`${order.createdDate} - ${order.email} - ${order.orderType}`}
-                      </p>
-                    </div>
-                  ))}
-            </div>
-          )}
+          {showHistory && <OrderHistory />}
         </div>
       </div>
       <footer className="footer footer-center p-4 bg-base-300 text-base-content">

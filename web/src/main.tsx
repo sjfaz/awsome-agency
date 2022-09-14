@@ -4,13 +4,29 @@ import App from "./App";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { trpc } from "../utils/trpc";
 import "./style/App.css";
+import "./style/output.css";
 
-function Main() {
+let url = "";
+const getUrl = async () => {
+  if (url) {
+    return url;
+  }
+  const response = await fetch("./config.json");
+  url = `${(await response.json()).apiUrl}beta`;
+  return url;
+};
+
+interface MainProps {
+  url: string;
+}
+
+function Main(props: MainProps) {
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() => {
     // const token = localStorage.getItem("token");
+    const apiUrl = props.url;
     return trpc.createClient({
-      url: "https://fvtz7ntv6a.execute-api.eu-west-1.amazonaws.com/beta",
+      url: apiUrl,
     });
   });
 
@@ -27,12 +43,13 @@ function Main() {
 
 let container: HTMLElement;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const apiUrl = await getUrl();
   if (!container) {
     container = document.getElementById("root") as HTMLElement;
     createRoot(container).render(
       <React.StrictMode>
-        <Main />
+        <Main url={apiUrl} />
       </React.StrictMode>
     );
   }
