@@ -7,7 +7,8 @@ AWSome Agency is a Digital B2B Agency that wants to allow ordering digital produ
 3/ tRPC is used in the API layer for e-2-e type safety.  
 4/ Data is stored in DynamoDB with Lambda processing the stream.  
 5/ Events go to Domain specific SQS queues and are processed by Lambda.
-NB/ Only te Marketing SQS is set up and sends a slack message when a new Order is created.
+
+NB/ Only the Marketing SQS is set up and sends a slack message when a new Order is created. This is a mono-repo with workspaces for web and services. Dependencies are managed at the top level project.
 
 ![target architecture](./architecture.png)
 
@@ -21,15 +22,13 @@ aws ssm put-parameter \
     --overwrite
 ```
 
-This is a mono-repo with workspaces for web and services. Dependencies are managed at the top level project.
-
 ## Built with CDK
 
 ## Main Project commands
 
 - `yarn cdk deploy --all` deploy all stack
 - `yarn cdk destroy --all` remove all stacks
-- `yarn test` remove all stacks
+- `yarn test` run tests
 
 ## Web Project commands
 
