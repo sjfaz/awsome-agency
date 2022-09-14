@@ -1,6 +1,6 @@
 # AWSome Agency
 
-AWSome Agency is a Digital B2B Agency that wants to allow ordering digital products online.
+AWSome Agency is a fictional Digital B2B Agency that wants to allow ordering digital products online.
 
 1/ There is a static SPA website Vite + React deployed to S3 + CloudFront.  
 2/ The API is a HTTP API running in API Gateway and Lambda.  
