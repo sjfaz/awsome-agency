@@ -1,5 +1,5 @@
-import { SQSEvent, DynamoDBStreamEvent, DynamoDBRecord } from "aws-lambda";
-import { doPostRequest } from "../core/common/messager";
+import { SQSEvent, DynamoDBRecord } from "aws-lambda";
+import { sendPromotionMessage } from "../core/marketing/promotion";
 
 exports.handler = async (event: SQSEvent) => {
   try {
@@ -11,10 +11,12 @@ exports.handler = async (event: SQSEvent) => {
       if (!newImage) {
         throw new Error("No new image found");
       } else {
-        await doPostRequest(`New order from: ${newImage.email.S}`);
+        await sendPromotionMessage(
+          `New order from: ${newImage.email.S} at ${newImage.createdDate.S}`
+        );
       }
     }
   } catch (error) {
-    await doPostRequest(JSON.stringify("Error: " + error));
+    console.log(`Error processing SQS: ${error}`);
   }
 };

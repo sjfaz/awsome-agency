@@ -1,6 +1,11 @@
 import * as trpc from "@trpc/server";
 import { Order } from "../core/accounts/order";
 import { z } from "zod";
+import {
+  awsLambdaRequestHandler,
+  CreateAWSLambdaContextOptions,
+} from "@trpc/server/adapters/aws-lambda";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
@@ -41,19 +46,9 @@ const appRouter = trpc
 const createContext = ({
   event,
   context,
-}: CreateAWSLambdaContextOptions<APIGatewayProxyEvent>) => {
-  return {
-    // user: "foo",
-    // tenant: "blah",
-  };
-}; // no context
-// type Context = trpc.inferAsyncReturnType<typeof createContext>;
-
-import {
-  awsLambdaRequestHandler,
-  CreateAWSLambdaContextOptions,
-} from "@trpc/server/adapters/aws-lambda";
-import { APIGatewayProxyEvent } from "aws-lambda";
+}: CreateAWSLambdaContextOptions<APIGatewayProxyEventV2>) => {
+  return {};
+};
 
 export const handler = awsLambdaRequestHandler({
   router: appRouter,

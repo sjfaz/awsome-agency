@@ -1,24 +1,49 @@
 # AWSome Agency
 
-Digital Agency B2B business called AWSome Agency.
-1/ DynamoDB Database with storage-first EDA - Lambda processes the stream.  
-2/ Events go to Domain specific SQS queues and are processed by Lambda with actions for downstream systems.  
-3/ There is a static website Vite + React deployed to S3 + CloudFront.  
-4/ The API is a HTTP API running in Lambda  
-NB: End-to-end type safety.
+AWSome Agency is a Digital B2B Agency that wants to allow ordering digital products online.
 
-Slides talk about Database choices and the storage-first EDA diagram  
-Demo shows:  
-1/ There are 3 Stacks deployed => DB, Web, API  
-2/ We show an order writing to DB.  
-3/ Show the project structure.  
-4/ Then add the Event Stream.  
-5/ Add another order - show the flow of the stream ()  
-Explain how these act as hooks for archiving data or automating tasks.
+1/ There is a static SPA website Vite + React deployed to S3 + CloudFront.  
+2/ The API is a HTTP API running in API Gateway and Lambda.  
+3/ tRPC is used in the API layer for e-2-e type safety.  
+4/ Data is stored in DynamoDB with Lambda processing the stream.  
+5/ Events go to Domain specific SQS queues and are processed by Lambda.
+NB/ Only te Marketing SQS is set up and sends a slack message when a new Order is created.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+![target architecture](./architecture.png)
 
-## Useful commands
+```
+# If you have a slack URL to use you can store in SSM Param store with the below CLI command - replace value with actual slack url.
+
+aws ssm put-parameter \
+    --name "/awesome-agency/slack-url" \
+    --type "String" \
+    --value "/services/UUID1/UUID2/UUID2" \
+    --overwrite
+```
+
+This is a mono-repo with workspaces for web and services. Dependencies are managed at the top level project.
+
+## Built with CDK
+
+## Main Project commands
+
+- `yarn cdk deploy --all` deploy all stack
+- `yarn cdk destroy --all` remove all stacks
+- `yarn test` remove all stacks
+
+## Web Project commands
+
+- `cd web` go to web folder
+- `yarn dev` run the Vite react site locally
+- `yarn css` start tailwind css watcher
+
+## Services Project
+
+- Store domain logic in the core folder under Marketing, Accounts etc.
+- For Lamnbda handler functions store in the functions folder.
+- `yarn css` start tailwind css watcher
+
+## Other useful CDK commands below:
 
 - `npm run build` compile typescript to js
 - `npm run watch` watch for changes and compile
@@ -26,12 +51,3 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 - `cdk deploy` deploy this stack to your default AWS account/region
 - `cdk diff` compare deployed stack with current state
 - `cdk synth` emits the synthesized CloudFormation template
-
-```
-aws dynamodb put-item \
-    --table-name Table \
-    --item '{
-        "pk": {"S": "EVENT#NEWAPP"}
-        "sk": {"S": "2022-01-01"}
-      }'
-```

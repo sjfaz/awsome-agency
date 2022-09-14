@@ -1,6 +1,7 @@
 import { doPostRequest } from "../core/common/messager";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 
-const handler = async function (event: any, context: any) {
+const handler = async function (event: APIGatewayProxyEventV2) {
   try {
     await doPostRequest("Simple test");
     return {
@@ -9,16 +10,10 @@ const handler = async function (event: any, context: any) {
       body: JSON.stringify(event),
     };
   } catch (error) {
-    let body;
-    if (error instanceof Error) {
-      body = error.stack;
-    } else {
-      body = JSON.stringify(error, null, 2);
-    }
     return {
       statusCode: 400,
       headers: {},
-      body: JSON.stringify(body),
+      body: JSON.stringify({ error }),
     };
   }
 };

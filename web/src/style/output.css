@@ -2589,10 +2589,6 @@ html {
   height: 1.5rem;
 }
 
-.min-h-\[calc\(100vh-200px\)\] {
-  min-height: calc(100vh - 200px);
-}
-
 .min-h-screen {
   min-height: 100vh;
 }
@@ -2607,10 +2603,6 @@ html {
 
 .w-6 {
   width: 1.5rem;
-}
-
-.w-10 {
-  width: 2.5rem;
 }
 
 .w-\[100px\] {
@@ -2675,11 +2667,6 @@ html {
 .text-5xl {
   font-size: 3rem;
   line-height: 1;
-}
-
-.text-xl {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
 }
 
 .font-bold {
