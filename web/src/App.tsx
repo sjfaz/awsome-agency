@@ -1,30 +1,22 @@
 import { useState } from "react";
 import { Input, Alert, Select } from "./components";
 import { trpc } from "../utils/trpc";
-import { OrderHistory } from "./components";
-import "./style/App.css";
+// import { OrderHistory } from "./components";
 
 function App() {
   const [inputValue, setInputValue] = useState({
     email: "",
     name: "",
     orderType: "Website",
-    showHistory: false,
   });
-  const { email, name, orderType, showHistory } = inputValue;
+  const { email, name, orderType } = inputValue;
   const createOrder = trpc.useMutation(["createOrder"]);
   const incompleteForm = !email || !name;
-  const toggleHistory = () => {
-    setInputValue((prev) => ({ ...prev, showHistory: !prev.showHistory }));
-  };
 
   return (
     <div className="bg-base-200 min-h-screen">
       <div className="hero pt-5">
-        <div
-          onClick={toggleHistory}
-          className="hero-content text-center bg-base-300 w-[480px]"
-        >
+        <div className="hero-content text-center bg-base-300 w-[480px]">
           <div className="max-w-md bg-base-500">
             <h1 className="text-5xl font-bold">AWSome Agency</h1>
             <p className="py-6">Enter your details to start your order.</p>
@@ -79,7 +71,6 @@ function App() {
               <Alert message="Please ensure the name and email are provided." />
             )}
           </div>
-          {showHistory && <OrderHistory />}
         </div>
       </div>
       <footer className="footer footer-center p-4 bg-base-300 text-base-content">
