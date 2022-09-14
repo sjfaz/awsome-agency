@@ -12,7 +12,7 @@ NB/ Only te Marketing SQS is set up and sends a slack message when a new Order i
 ![target architecture](./architecture.png)
 
 ```
-# If you have a slack URL to use you can store in SSM Param store with the below CLI command - replace value with actual slack url.
+# If you have a slack URL to use, you can store in AWS SSM Param store with the below CLI command - replace value with actual slack url.
 
 aws ssm put-parameter \
     --name "/awesome-agency/slack-url" \
