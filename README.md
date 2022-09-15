@@ -2,7 +2,7 @@
 
 AWSome Agency is a fictional Digital B2B Agency that wants to allow ordering digital products online.
 
-1/ There is a static SPA website Vite + React deployed to S3 + CloudFront.  
+1/ The front-end is a static SPA website Vite + React deployed to S3 + CloudFront.  
 2/ The API is a HTTP API running in API Gateway and Lambda.  
 3/ tRPC is used in the API layer for e-2-e type safety.  
 4/ Data is stored in DynamoDB with Lambda processing the stream.  
@@ -18,7 +18,7 @@ NB/ Only the Marketing SQS is set up and sends a slack message when a new Order 
 aws ssm put-parameter \
     --name "/awesome-agency/slack-url" \
     --type "String" \
-    --value "/services/UUID1/UUID2/UUID2" \
+    --value "/services/UUID1/UUID2/UUID3" \
     --overwrite
 ```
 
