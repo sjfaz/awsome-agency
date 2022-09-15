@@ -14,7 +14,7 @@ export class Database extends Construct {
   constructor(parent: Stack, name: string, props: {}) {
     super(parent, name);
 
-    const table = new dynamodb.Table(this, "Table", {
+    const table = new dynamodb.Table(this, "OrdersTable", {
       partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -24,10 +24,9 @@ export class Database extends Construct {
 
     const marketingQueue = new aws_sqs.Queue(this, "MarketingQueue");
 
-    const streamProcessor = new NodejsFunction(this, "GetData", {
+    const streamProcessor = new NodejsFunction(this, "GetStreamData", {
       ...lambdaFnProps,
       entry: "./services/functions/stream-processor.ts", // accepts .js, .jsx, .ts and .tsx files
-      functionName: "stream-processor",
       handler: "handler",
       memorySize: 512,
       timeout: Duration.seconds(30),
