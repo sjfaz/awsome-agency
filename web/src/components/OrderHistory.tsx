@@ -1,20 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { trpc } from "../../utils/trpc";
-// import { Input } from "../components";
-// const toggleHistory = () => {
-//   setInputValue((prev) => ({ ...prev, showHistory: !prev.showHistory }));
-// };
 
-// TODO: finish this component to show order history.
-interface OrderHistoryProps {}
+interface OrderHistoryProps {
+  email: string;
+}
 
 export const OrderHistory: React.FC<OrderHistoryProps> = (
   props: OrderHistoryProps
 ) => {
-  const getOrders = trpc.useQuery(["getOrders", "info@example.com"]);
+  const getOrders = trpc.useQuery(["getOrders", props.email]);
+
   return (
     <div className="">
-      <div>Email Input here</div>
       <div className="pt-5 text-center">
         {getOrders.isLoading
           ? "Loading..."

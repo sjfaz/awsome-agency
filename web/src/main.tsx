@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import Home from "./pages/Home";
+import History from "./pages/History";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { trpc } from "../utils/trpc";
+import {
+  Link,
+  MakeGenerics,
+  Outlet,
+  ReactLocation,
+  Router,
+  useMatch,
+} from "@tanstack/react-location";
 import "./style/output.css";
 
 let url = "";
@@ -30,11 +39,18 @@ function Main(props: MainProps) {
   });
 
   console.log("rendering...");
+  const location = new ReactLocation();
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <Router
+          location={location}
+          routes={[
+            { path: "/", element: <Home /> },
+            { path: "history", element: <History /> },
+          ]}
+        ></Router>
       </QueryClientProvider>
     </trpc.Provider>
   );

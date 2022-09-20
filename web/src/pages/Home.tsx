@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Input, Alert, Select } from "./components";
-import { trpc } from "../utils/trpc";
-// import { OrderHistory } from "./components";
+import { Input, Alert, Select, Header } from "../components";
+import { trpc } from "../../utils/trpc";
 
-function App() {
+export default function Home() {
   const [inputValue, setInputValue] = useState({
     email: "",
     name: "",
@@ -15,14 +14,7 @@ function App() {
 
   return (
     <div className="bg-base-200 min-h-screen">
-      <div className="hero pt-5">
-        <div className="hero-content text-center bg-base-300 w-[480px]">
-          <div className="max-w-md bg-base-500">
-            <h1 className="text-5xl font-bold">AWSome Agency</h1>
-            <p className="py-6">Enter your details to start your order.</p>
-          </div>
-        </div>
-      </div>
+      <Header buttonUrl="/history" />
       <div className="flex flex-col w-full border-opacity-50 pb-20 h-full">
         <div className="divider"></div>
         <div className="grid rounded-box place-items-center">
@@ -81,5 +73,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
