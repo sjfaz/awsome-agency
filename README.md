@@ -12,9 +12,15 @@ NB/ Only the Marketing SQS is set up and sends a slack message when a new Order 
 
 ![target architecture](./architecture.png)
 
-```
-# If you have a slack URL to use, you can store in AWS SSM Param store with the below CLI command - replace value with actual slack url.
+In order for the API Url to be passed to the Static Website.
+A config.json file is created at deploy time.
+The React app gets the URL from this file.
 
+If you are running the web dev server locally create a config.json in the web public folder.
+
+If you have a slack URL to use, you can store in AWS SSM Param store with the below CLI command - replace value with actual slack url.
+
+```
 aws ssm put-parameter \
     --name "/awesome-agency/slack-url" \
     --type "String" \

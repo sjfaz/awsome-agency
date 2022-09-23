@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Input, Alert, Select, Header } from "../components";
 import { trpc } from "../../utils/trpc";
+import { validateEmail } from "../../utils/validate";
 
 export default function Home() {
   const [inputValue, setInputValue] = useState({
@@ -10,7 +11,8 @@ export default function Home() {
   });
   const { email, name, orderType } = inputValue;
   const createOrder = trpc.useMutation(["createOrder"]);
-  const incompleteForm = !email || !name;
+  const validEmail = validateEmail(email);
+  const incompleteForm = !email || !name || !validEmail;
 
   return (
     <div className="bg-base-200 min-h-screen">
@@ -60,7 +62,7 @@ export default function Home() {
               </button>
             </div>
             {incompleteForm && (
-              <Alert message="Please ensure the name and email are provided." />
+              <Alert message="Please provide the name and a valid email." />
             )}
           </div>
         </div>
