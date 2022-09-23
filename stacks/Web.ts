@@ -85,7 +85,7 @@ export class StaticSite extends Construct {
       stdio: ["ignore", process.stderr, "inherit"],
     };
 
-    // TODO: check why sometimes bundle does build on synth
+    // TODO: check why sometimes bundle does not build on synth
     const bundle = Source.asset(join(__dirname, "../web"), {
       bundling: {
         command: [
@@ -101,7 +101,7 @@ export class StaticSite extends Construct {
             } catch {
               return false;
             }
-            execSync(`cd web && yarn build`, execOptions);
+            execSync(`cd web && npm run build`, execOptions);
             copySync(join(__dirname, "../web/dist"), outputDir, {
               ...execOptions,
               recursive: true,
